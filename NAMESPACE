@@ -1,0 +1,3 @@
+useDynLib(WRScpp_test)
+exportPattern("^[[:alpha:]]+")
+importFrom(Rcpp, evalCpp)
