@@ -1,11 +1,12 @@
-Package: WRScpp_test
+Package: WRScpp
 Type: Package
-Title: What the package does (short line)
+Title: C++ sub-routines for the R package WRS
 Version: 1.0
-Date: 2015-03-16
-Author: Your Name
-Maintainer: Your Name <your@email.com>
-Description: More about what it does (maybe more than one line)
+Date: 2013-07-18
+Author: Rand Wilcox, Xiao He
+Maintainer: Xiao He <hex@usc.edu>
+Description: This package contains C++ implementations of iterative routines originally coded in R. These sub-routines provide substantial performance boosts.
 License: GPL (>= 2)
-Imports: Rcpp (>= 0.11.4)
-LinkingTo: Rcpp
+Depends: Rcpp (>= 0.10.2), RcppArmadillo (>= 0.3.900.0), MASS (>=
+        7.3-27), scatterplot3d (>= 0.3-33)
+LinkingTo: Rcpp, RcppArmadillo, MASS, scatterplot3d

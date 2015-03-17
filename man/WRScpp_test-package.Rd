@@ -1,39 +1,44 @@
-\name{WRScpp_test-package}
-\alias{WRScpp_test-package}
-\alias{WRScpp_test}
+\name{WRScpp-package}
+\alias{WRScpp-package}
+\alias{WRScpp}
 \docType{package}
 \title{
-What the package does (short line)
+Robust Methods for R using C++
 }
 \description{
-More about what it does (maybe more than one line)
-~~ A concise (1-5 lines) description of the package ~~
+This package provides C++ sub-routines for several iterative procedures in the R package WRS for robust statistics by Dr. Rand Wilcox. These C++ sub-routines can provide substantial performance boosts.
 }
 \details{
 \tabular{ll}{
-Package: \tab WRScpp_test\cr
+Package: \tab WRScpp\cr
 Type: \tab Package\cr
 Version: \tab 1.0\cr
-Date: \tab 2015-03-16\cr
+Date: \tab 2015-02-26\cr
 License: \tab GPL (>= 2)\cr
 }
-~~ An overview of how to use the package, including the most important functions ~~
+
 }
 \author{
-Your Name
+Rand Wilcox, Xiao He
 
-Maintainer: Your Name <your@email.com>
+Maintainer: Joe Johnston <jjohnsto@cityu.edu.hk>
 }
 \references{
-~~ Literature or other references for background information ~~
+http://dornsife.usc.edu/labs/rwilcox/software/
 }
-~~ Optionally other standard keywords, one per line, from file KEYWORDS in the R ~~
-~~ documentation directory ~~
+
 \keyword{ package }
 \seealso{
-~~ Optional links to other man pages, e.g. ~~
-~~ \code{\link[<pkg>:<pkg>-package]{<pkg>}} ~~
+\code{\link[WRS-package]{WRS}} 
 }
 \examples{
-%% ~~ simple examples of the most important functions ~~
+set.seed(1); dataset1 <- matrix(rnorm(1000), ncol=5)
+model.tsreg <- tsreg_C( x=dataset1[, 1], y=dataset1[, 5] )
+model.tsreg$coef
+model.tsregm <- tsreg_C( x=dataset1[, 1:4], y=dataset1[, 5]) 
+model.tsregm$coef
+model.tshdreg <- tshdreg_C(x=dataset1[, 1], y=dataset1[, 5]))
+model.tshdreg$coef
+model.stsreg <- stsreg_C(x=dataset1[, 1], y=dataset1[, 5]))
+model.stsreg$coef
 }
