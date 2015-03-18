@@ -25,16 +25,18 @@ corfun=pbcor,plotit=FALSE,...){
 		y<-y[flag]
 		x<-as.matrix(x)
 	}
+	
 	if(ncol(x)==1){
-		temp1<-.Call("stsregp1_C", X=x,Y=y)
-		coef<-temp1$coef
-		res<-temp1$res
+	  temp1<-.Call("stsregp1_C", X=x,Y=y)
+	  coef<-temp1$coef
+	  res<-temp1$res
 	}
 	if(ncol(x)>1){
-		temp1<-.Call("stsreg_for", X=x,Y=y, IT=as.integer(iter))
-		coef<-c(temp1$alpha, temp1$beta)
-		res<-temp1$res
+	  temp1<-.Call("stsreg_for", X=x,Y=y, IT=as.integer(iter))
+	  coef<-temp1$coef
+	  res<-temp1$res
 	}
+	
 	yhat<-y-res
 	stre=NULL
 	e.pow<-varfun(yhat)/varfun(y)
@@ -110,8 +112,8 @@ corfun=pbcor,plotit=FALSE,tol=.0001,...){
 		res<-y-coef[2]*x-coef[1]
 	}
 	if(ncol(x)>1){
-		temp1<-.Call("tshdreg_for", X=x,Y=y, IT=as.integer(iter), TOL=tol)
-		coef<-c(temp1$alpha, temp1$beta)
+		temp1<-.Call("tshdreg_C", X=x,Y=y, IT=as.integer(iter), TOL=tol,hd=as.integer(HD))
+		coef<-temp1$coef
 		res<-temp1$res
 	}
 	yhat<-y-res
@@ -133,7 +135,7 @@ corfun=pbcor,plotit=FALSE,tol=.0001,...){
 
 
 tsreg_C<-function(x,y,xout=FALSE,outfun=out,iter=10,varfun=pbvar,
-corfun=pbcor,plotit=FALSE,WARN=TRUE,HD=FALSE,...){
+corfun=pbcor,plotit=FALSE,WARN=TRUE,hd=FALSE,...){
 	#
 	#  Compute Theil-Sen regression estimator
 	#
@@ -159,16 +161,17 @@ corfun=pbcor,plotit=FALSE,WARN=TRUE,HD=FALSE,...){
 		y<-y[flag]
 		x<-as.matrix(x)
 	}
+	
 	if(ncol(x)==1){
-		temp1<-.Call("tsp1reg_C", X=x, Y=y, HD=as.integer(HD))
-		coef<-temp1$coef
-		res<-temp1$res
-	} 
-	if(ncol(x)>1){
-		temp1<-.Call("tsreg_for", X=x, Y=y, IT=as.integer(iter), HD=as.integer(HD))
-		coef<-c(temp1$alpha,temp1$beta)
-		res<-temp1$res
+	  coef<-.Call("tsp1reg_C", X=x, Y=y, HD=as.integer(hd))
+	  res<-y-coef[2]*x-coef[1]
 	}
+	if(ncol(x)>1){
+	  temp1<-.Call("tsreg_C", X=x,Y=y, IT=as.integer(iter), HD=as.integer(hd))
+	  coef<-temp1$coef
+	  res<-temp1$res
+	}
+  
 	yhat<-y-res
 	stre=NULL
 	temp=varfun(y)
@@ -556,42 +559,5 @@ val<-var(m[temp,])
 loc<-apply(m[temp,],2,mean)
 list(center=loc,cov=val)
 }
-
-addedOutliers <- function( outliers = NULL, p = NULL, n = 20,  nout = 1, rho = 0.9, cutoff = .01,
-          					  niter = 500, seed = TRUE, FUN = outmgv_test, loc_scale = c(0, 2), 
-          					  scale = TRUE, center = TRUE, ... ){
-     require( parallel ) 
-     if( is.null(p) && is.null(outliers) )
-         stop( "'outliers' and 'p' cannot both be NULL. Please specify one of them." )
-     if(seed)
-     	set.seed(1)
-     simdata <- split( data.frame( rmul( n = ( n - nout )*niter, p = p, rho = rho, ...)), f = rep(1:niter, each = n - nout))
-     if( is.null(outliers) ) {
-         if(seed) 
-         	set.seed(2)
-         outliers <- rmul( nout*niter, p, mean = loc_scale[1], sd = loc_scale[2] )
-         outliers <- split( as.data.frame( outliers ) , f = rep(1:niter, each = nout) ) 
-         temp  <- mapply(function( x, y ){ 
-         					x <- rbind(as.matrix(x), as.matrix(y))
-                            FUN( x, plotit = FALSE, cutoff = cutoff, ...)[2:3]}, x = outliers, y = simdata)
-         #temp2  <- mapply(function( x ){ FUN( x , plotit=FALSE,cutoff=cutoff, ...)[2:3] }, x = simdata )
-     } else {
-         p <- length(outliers)
-         outliers <- matrix( rep(outliers, nout), nout, byrow = TRUE )
-         temp  <- mapply(function( x, y ){ 
-         					FUN( rbind(outliers, as.matrix(x)), plotit = FALSE, cutoff = cutoff, ...)[2:3] }, x = simdata)
-     }
-     temp.totalout <-  unlist( temp[1, ])
-     #temp.outp <- sum(unlist( mapply( function( x ){ if( length(x) == 1 && is.na(x)  ) 0 
-     #                                                  else if( sum( x <= nout ) == nout ) 1 
-     #                                                  else 0 }, x = temp[2,]) ))/niter
-     temp.outp2 <- unlist( mapply( function( x ){ if( length(x) == 1 && is.na(x)  ) 0 
-                                                       else sum( x <= nout )}, x = temp[2,]) )
-     list(`Avg. total number of identified observations:` = mean(temp.totalout),
-          `Avg. total number of of non-outliers identified:` = mean(temp.totalout - temp.outp2),
-          `Avg. total number of of outliers identified:` = mean(temp.outp2),
-          `Avg. rate of added outliers identified:` = mean(temp.outp2)/nout)
- }
-
 
 
